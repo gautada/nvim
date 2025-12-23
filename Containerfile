@@ -39,7 +39,7 @@ COPY entrypoint.sh /usr/bin/container-entrypoint
 # │ APPLICATION        │
 # ╰――――――――――――――――――――╯
 RUN /bin/sed -i 's|dl-cdn.alpinelinux.org/alpine/|mirror.math.princeton.edu/pub/alpinelinux/|g' /etc/apk/repositories \
- && /sbin/apk add --no-cache neovim 
+ && /sbin/apk add --no-cache neovim tini
 
 # ╭――――――――――――――――――――╮
 # │ CONTAINER          │
@@ -51,3 +51,7 @@ VOLUME /mnt/volumes/container
 VOLUME /mnt/volumes/secrets
 EXPOSE 8080/tcp
 WORKDIR /home/$USER
+
+ENTRYPOINT ["/sbin/tini", "--"]
+CMD ["nvim", "--headless", "--listen", "127.0.0.1:6074"]
+
