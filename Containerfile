@@ -53,5 +53,5 @@ EXPOSE 8080/tcp
 WORKDIR /home/$USER
 
 ENTRYPOINT ["/sbin/tini", "--"]
-CMD ["nvim", "--headless", "--listen", "127.0.0.1:6074"]
+CMD ["nvim", "--headless", "--listen", "0.0.0.0:6074"]
 
