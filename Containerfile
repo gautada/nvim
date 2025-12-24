@@ -36,25 +36,34 @@ RUN /usr/sbin/usermod -l $USER alpine \
 COPY entrypoint.sh /usr/bin/container-entrypoint
 
 # ╭――――――――――――――――――――╮
+# │ PRIVILEGES         │
+# ╰――――――――――――――――――――╯
+COPY privileges /etc/container/privileges
+
+# ╭――――――――――――――――――――╮
 # │ APPLICATION        │
 # ╰――――――――――――――――――――╯
-RUN /bin/sed -i 's|dl-cdn.alpinelinux.org/alpine/|mirror.math.princeton.edu/pub/alpinelinux/|g' /etc/apk/repositories \
- && /sbin/apk add --no-cache neovim s6
-
 COPY nvim-run /etc/services.d/nvim/run
+RUN /bin/sed -i 's|dl-cdn.alpinelinux.org/alpine/|mirror.math.princeton.edu/pub/alpinelinux/|g' /etc/apk/repositories \
+ && /sbin/apk add --no-cache neovim s6 \
+ && chmod +x /etc/services.d/nvim/run ; ls -al /etc/services.d/nvim/
+
 
 # ╭――――――――――――――――――――╮
 # │ CONTAINER          │
 # ╰――――――――――――――――――――╯
-USER $USER
+# USER $USER
 VOLUME /mnt/volumes/backup
 VOLUME /mnt/volumes/configmaps
-VOLUME /mnt/volumes/container
+VOLUME /mnt/volumes/data
 VOLUME /mnt/volumes/secrets
-EXPOSE 8080/tcp
+EXPOSE 6074/tcp
 WORKDIR /home/$USER
 
 # ENTRYPOINT ["/sbin/tini", "--"]
 # CMD ["nvim", "--headless", "--listen", "0.0.0.0:6074"]
 # s6 init is PID 1
-ENTRYPOINT ["/init"]
+# ENTRYPOINT ["/init"]
+ENTRYPOINT ["/usr/bin/s6-svscan", "/etc/services.d"]
+# /usr/bin/s6-svscan /etc/services.d
+# ENTRYPOINT ["tail", "-f", "/dev/null"]

@@ -1,8 +1,11 @@
-#!/command/with-contenv sh
+#!/bin/sh
 
 set -e
 
-echo "Starting `neovim` as headless server"
-
-exec nvim --headless --listen 0.0.0.0:6074
+echo "Starting 'neovim' as headless server"
+# which nvim
+_cmd="/usr/bin/nvim --headless --listen 0.0.0.0:6074"
+su nvim -c "${_cmd}"
+# exec s6-setuidgid nvim \
+#   sh -lc 'exec nvim --headless --listen 0.0.0.0:6074'
 
