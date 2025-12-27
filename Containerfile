@@ -42,11 +42,12 @@ COPY privileges /etc/container/privileges
 # ╰――――――――――――――――――――╯
 COPY neovim.s6 /etc/services.d/neovim/run
 RUN /bin/sed -i 's|dl-cdn.alpinelinux.org/alpine/|mirror.math.princeton.edu/pub/alpinelinux/|g' /etc/apk/repositories \
- && /sbin/apk add --no-cache neovim stow
+ && /sbin/apk add --no-cache bash make neovim nvim-treesitter stow
 EXPOSE 6074/tcp
 USER ${USER}
 WORKDIR /home/${USER}/.local/share/dotfiles
-RUN git clone https://github.com/gautada/dotfiles.git public
+RUN git clone https://github.com/gautada/dotfiles.git public \
+ && /home/${USER}/.local/share/dotfiles/public/bootstrap.sh
 WORKDIR /home/${USER}
 USER root
 RUN chown ${USER}:${USER} -R /home/${USER}
