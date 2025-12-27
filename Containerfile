@@ -1,9 +1,7 @@
-ARG ALPINE_VERSION=3.22
+ARG ALPINE_VERSION=3.23
 FROM docker.io/gautada/alpine:$ALPINE_VERSION as CONTAINER
 
 ARG IMAGE_NAME=neovim
-ARG IMAGE_VERSION=0.11.5
-ARG PACKAGE_VERSION=r0
 
 # ╭――――――――――――――――――――╮
 # │ METADATA           │
@@ -12,7 +10,6 @@ LABEL org.opencontainers.image.title="${IMAGE_NAME}"
 LABEL org.opencontainers.image.description="A host for neovim server."
 LABEL org.opencontainers.image.url="https://hub.docker.com/r/gautada/neovim"
 LABEL org.opencontainers.image.source="https://github.com/gautada/neovim"
-LABEL org.opencontainers.image.version="${IMAGE_VERSION}"
 LABEL org.opencontainers.image.license="Upstream"
 
 # ╭――――――――――――――――――――╮
@@ -33,7 +30,7 @@ RUN /usr/sbin/usermod -l $USER alpine \
 # │ ENTRYPOINT         │
 # ╰――――――――――――――――――――╯
 # Overwrite upstream entrypoint
-COPY entrypoint.sh /usr/bin/container-entrypoint
+# COPY entrypoint.sh /usr/bin/container-entrypoint
 
 # ╭――――――――――――――――――――╮
 # │ PRIVILEGES         │
@@ -41,29 +38,15 @@ COPY entrypoint.sh /usr/bin/container-entrypoint
 COPY privileges /etc/container/privileges
 
 # ╭――――――――――――――――――――╮
-# │ APPLICATION        │
-# ╰――――――――――――――――――――╯
-COPY nvim-run /etc/services.d/nvim/run
-RUN /bin/sed -i 's|dl-cdn.alpinelinux.org/alpine/|mirror.math.princeton.edu/pub/alpinelinux/|g' /etc/apk/repositories \
- && /sbin/apk add --no-cache neovim s6 \
- && chmod +x /etc/services.d/nvim/run ; ls -al /etc/services.d/nvim/
-
-
-# ╭――――――――――――――――――――╮
 # │ CONTAINER          │
 # ╰――――――――――――――――――――╯
-# USER $USER
-VOLUME /mnt/volumes/backup
-VOLUME /mnt/volumes/configmaps
-VOLUME /mnt/volumes/data
-VOLUME /mnt/volumes/secrets
+COPY neovim.s6 /etc/services.d/neovim/run
+RUN /bin/sed -i 's|dl-cdn.alpinelinux.org/alpine/|mirror.math.princeton.edu/pub/alpinelinux/|g' /etc/apk/repositories \
+ && /sbin/apk add --no-cache neovim stow
 EXPOSE 6074/tcp
-WORKDIR /home/$USER
-
-# ENTRYPOINT ["/sbin/tini", "--"]
-# CMD ["nvim", "--headless", "--listen", "0.0.0.0:6074"]
-# s6 init is PID 1
-# ENTRYPOINT ["/init"]
-ENTRYPOINT ["/usr/bin/s6-svscan", "/etc/services.d"]
-# /usr/bin/s6-svscan /etc/services.d
-# ENTRYPOINT ["tail", "-f", "/dev/null"]
+USER ${USER}
+WORKDIR /home/${USER}/.local/share/dotfiles
+RUN git clone https://github.com/gautada/dotfiles.git public
+WORKDIR /home/${USER}
+USER root
+RUN chown ${USER}:${USER} -R /home/${USER}
