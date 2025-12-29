@@ -40,7 +40,7 @@ COPY privileges /etc/container/privileges
 # ╭――――――――――――――――――――╮
 # │ CONTAINER          │
 # ╰――――――――――――――――――――╯
-COPY neovim.s6 /etc/services.d/neovim/run
+COPY nvim.s6 /etc/services.d/nvim/run
 RUN /bin/sed -i 's|dl-cdn.alpinelinux.org/alpine/|mirror.math.princeton.edu/pub/alpinelinux/|g' /etc/apk/repositories \
  && /sbin/apk add --no-cache bash make neovim nvim-treesitter stow
 EXPOSE 6074/tcp
