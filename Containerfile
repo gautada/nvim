@@ -47,7 +47,7 @@ EXPOSE 6074/tcp
 # USER ${USER}
 WORKDIR /home/${USER}/.local/share/dotfiles
 RUN git clone https://github.com/gautada/dotfiles.git public \
- && /home/${USER}/.local/share/dotfiles/public/bootstrap.sh
+ && su ${USER} -c "public/bootstrap.sh"
 WORKDIR /home/${USER}
 # USER root
 RUN chown ${USER}:${USER} -R /home/${USER}
