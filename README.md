@@ -5,3 +5,5 @@ neovim server.
 
 - [Remote neovim for Dummies](https://kraust.github.io/posts/remote-neovim-for-dummies/)
 - [Neovim: Remote](https://neovim.io/doc/user/remote.html)
+
+FF1
