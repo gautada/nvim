@@ -44,10 +44,10 @@ COPY nvim.s6 /etc/services.d/nvim/run
 RUN /bin/sed -i 's|dl-cdn.alpinelinux.org/alpine/|mirror.math.princeton.edu/pub/alpinelinux/|g' /etc/apk/repositories \
  && /sbin/apk add --no-cache bash make neovim nvim-treesitter stow
 EXPOSE 6074/tcp
-USER ${USER}
+# USER ${USER}
 WORKDIR /home/${USER}/.local/share/dotfiles
 RUN git clone https://github.com/gautada/dotfiles.git public \
  && /home/${USER}/.local/share/dotfiles/public/bootstrap.sh
 WORKDIR /home/${USER}
-USER root
+# USER root
 RUN chown ${USER}:${USER} -R /home/${USER}
